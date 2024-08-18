@@ -47,3 +47,19 @@ plt.suptitle("After Removing The Extreme Value", fontsize = 20)
 
 plt.show()
 
+# People who didn't play:
+'''
+Implied by sum_gamerounds value = 0. They're not at gate_30 or gate_40. They haven't cleared a game round. Why ?
+1. Don't play or don't like to play or other prefs.
+2. No time to play.
+3. Other reasons
+'''
+
+'''
+As we play & progress in the game, the levels get tougher and the speed of level clearance decreases.
+Therefore, we tend to lose engagement. Very few of the players reach the end of the game through the funnel.
+The numbers decrease as we progress level by level. This increases the churn rate. KPI for difficulty level measure.
+Retention ideas: 
+'''
+
+
