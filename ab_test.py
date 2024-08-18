@@ -3,16 +3,27 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# hypothesis testing
+from scipy.stats import shapiro
+import scipy.stats as stats
 
 # Read Dataset
 df = pd.read_csv('./dataset/cookie_cats.csv')
-print(df.info()) # No null values
+print(df.info())  # No null values
 
 # Check for duplicates:
 duplicates = df[df.duplicated(subset='userid', keep=False)]
 # Count duplicates:
 duplicate_count = duplicates['userid'].value_counts()
-print(duplicate_count) # There are no duplicates in the dataset
+print(f"Duplicate count: {duplicate_count}")  # There are no duplicates in the dataset
+
+# descriptive stats
+percentiles = [0.01, 0.05, 0.1, 0.15, 0.20, 0.80, 0.90, 0.95, 0.99]
+des_stats = df.describe(percentiles)[['sum_gamerounds']]
+print(des_stats)
+
+version_stats = df.groupby('version').sum_gamerounds.agg(['count', 'mean', 'std', 'min', 'max'])
+print(version_stats)
 
 # Basic EDA to understand Dataset:
 # Datapoints in each group:
@@ -23,7 +34,7 @@ plt.pie(x=version_counts,
         radius=0.5,
         startangle=90)
 plt.title('Distribution of sample in A/B Testing')
-plt.axis('equal') # to ensure the pie chart is perfectly circular
+plt.axis('equal')  # to ensure the pie chart is perfectly circular
 plt.show()
 
 # Distribution of retentions:
@@ -55,7 +66,7 @@ Let's analyse further to understand player psychology and retention. What drives
 plt.figure(figsize=(18, 6))
 sns.boxplot(x=df['version'], y=df['sum_gamerounds'])
 
-plt.suptitle('Outliers in the distribution of players at gate_30 & gate_40', fontsize= 20)
+plt.suptitle('Outliers in the distribution of players at gate_30 & gate_40', fontsize=20)
 plt.title('Distribution of control & test groups', fontsize=10)
 
 plt.tight_layout(pad=4)
@@ -63,3 +74,17 @@ plt.show()
 # There seems to be an outlier for gate_30.
 
 # Removing Outlier:
+df = df[df['sum_gamerounds'] < df['sum_gamerounds'].max()]
+
+fig, axes = plt.subplots(1, 4, figsize=(18, 5))
+df['sum_gamerounds'].hist(ax=axes[0], color="steelblue")
+df[(df.version == "gate_30")].hist(df["sum_gamerounds"], ax=axes[1], color="steelblue")
+df[(df.version == "gate_40")].hist(df["sum_gamerounds"], ax=axes[2], color="steelblue")
+sns.boxplot(x=df['version'], y=df['sum_gamerounds'], ax=axes[3])
+
+plt.suptitle("After Removing The Extreme Value", fontsize=20)
+axes[0].set_title("Distribution of Total Game Rounds", fontsize=15)
+axes[1].set_title("Distribution of Gate 30 (A)", fontsize=15)
+axes[2].set_title("Distribution of Gate 40 (B)", fontsize=15)
+axes[1].set_title("Distribution of Two Groups", fontsize=15)
+plt.tight_layout(pad=4)
