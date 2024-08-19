@@ -1,10 +1,12 @@
 import pandas as pd
-import numpy as np
-import scipy.stats as stats
 import mpmath
 from scipy.stats import shapiro, anderson
+import scipy.stats as stats
 import seaborn as sns
 import matplotlib.pyplot as plt
+import warnings
+
+warnings.filterwarnings('ignore')
 
 # Hypothesis testing
 '''
@@ -22,55 +24,32 @@ group_B = df[df['group'] == "B"]['sum_gamerounds']
 # check normality by shapiro test (not accurate for large datasets.)
 normal_A = shapiro(group_A)[1] < 0.05
 normal_B = shapiro(group_B)[1] < 0.05
-print(f'Shapiro test: {normal_A}')
-print(f'Shapiro test: {normal_B}')
-
-# anderson test
-resultA = anderson(group_A)
-resultB = anderson(group_B)
-
-# Print the results
-print('Anderson-Darling Test Statistic:', resultA.statistic)
-print('Critical Values:', resultA.critical_values)
-print('Significance Levels:', resultA.significance_level)
-
-
-print('Anderson-Darling Test Statistic:', resultB.statistic)
-print('Critical Values:', resultB.critical_values)
-print('Significance Levels:', resultB.significance_level)
-
-
-def anderson_darling_p_value(ad_statistic):
-
-    # Desired precision
-    mpmath.mp.dps = 100
-
-    if ad_statistic >= 0.6:
-        p = mpmath.exp(1.2937 - 5.709 * ad_statistic + 0.0186 * ad_statistic ** 2)
-    elif 0.34 < ad_statistic < 0.6:
-        p = mpmath.exp(0.9177 - 4.279 * ad_statistic - 1.38 * ad_statistic ** 2)
-    elif 0.20 < ad_statistic <= 0.34:
-        p = 1 - mpmath.exp(-8.318 + 42.796 * ad_statistic - 59.938 * ad_statistic ** 2)
-    else:  # ad_statistic <= 0.20
-        p = 1 - mpmath.exp(-13.436 + 101.14 * ad_statistic - 223.73 * ad_statistic ** 2)
-
-    return p
-
-
-p_valueA = anderson_darling_p_value(resultA.statistic)  # AD Statistic result
-print(f"P-Value for AD Statistic {resultA.statistic}: {p_valueA}")
-
-p_valueB = anderson_darling_p_value(resultB.statistic)  # AD Statistic result
-print(f"P-Value for AD Statistic {resultB.statistic}: {p_valueB}")
-
-print(f"Does group_A follow normal distribution: {p_valueA < 0.05}")
-print(f"Does group_B follow normal distribution: {p_valueB < 0.05}")
+print(f'Shapiro test: {normal_A} for p-value < 0.05 i.e non-normal distribution')
+print(f'Shapiro test: {normal_B} for p-value < 0.05 i.e non-normal distribution')
 
 figA = sns.histplot(group_A, bins=100, kde=False, color='steelblue')
 plt.show()
 
 figB = sns.histplot(group_B, bins=100, kde=False, color='steelblue')
-plt.show()  # Right skewed normal distribution
+plt.show()
+# The distributions also show a +ve/ Right-skewed distribution. Not normally distributed.
 
-# Both have similar kind of distribution plots & both are not normally distributed
+'''
+Since non-normal, non-parametric tests: Mann Whitney U & Chi-squared test.
+Chi-squared test is preferred if there is categorical or ordinal data. Since sum_gamerounds is numerical data, 
+Mann Whitney U makes more sense as a statistical non-parametric test.
+We'll use Mann whitney to compare distributions of the independent groups. The outcome variable is boolean 
+H0: Both have the same distribution. i.e group_A == group_B
+H1: Both have different distributions. They're not same.
+'''
+
+# Mann Whitney U
+mw_test = stats.mannwhitneyu(group_A, group_B)[1]
+print(f"Mann Whitney p-value: \n{mw_test}")
+
+if mw_test < 0.05:
+    # Reject null hypothesis
+    print(f"Both have different distributions. They're not same.")
+else:
+    print(f"Both have same distributions.")
 
