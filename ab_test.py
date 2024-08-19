@@ -2,6 +2,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import shapiro
+import scipy.stats as stats
+
 
 # dataFrame
 df = pd.read_csv('./dataset/cookie_cats_cleaned.csv')
@@ -135,3 +138,9 @@ print(df.groupby(["version",
                                                        "max"]).reset_index())
 
 # Hypothesis Testing:
+
+# assigning a/b groups
+df['group'] = np.where(df.version == 'gate_30', 'A', 'B')
+
+print(df.head(10))
+df.to_csv('./dataset/cookie_cats_hypo.csv', index=False)
