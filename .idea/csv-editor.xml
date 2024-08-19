@@ -10,6 +10,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/dataset/cookie_cats_cleaned.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/dataset/cookie_cats_hypo.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
